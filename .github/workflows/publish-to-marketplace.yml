@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: "Release type (patch, minor, major)"
+        description: 'Release type (patch, minor, major)'
         required: true
-        default: "patch"
+        default: 'patch'
 
 jobs:
   publish:
@@ -16,20 +16,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # Needed for versioning & tagging
+          fetch-depth: 0 # Needed for versioning & tagging
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Show npm version and config
+        run: |
+          npm -v
+          npm config set fund false
+          npm config set audit false
+          npm config set registry https://registry.npmjs.org
+
+      - name: Clean npm cache
+        run: npm cache clean --force
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Bump version and push tag
         uses: phips28/gh-action-bump-version@master
         with:
-          tag-prefix: "v"
+          tag-prefix: 'v'
           version-type: ${{ github.event.inputs.release_type }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
