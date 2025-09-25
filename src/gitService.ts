@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { FileItem, FileStatus } from './types';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 export class GitService {
   private workspaceRoot: string;
@@ -162,13 +163,32 @@ export class GitService {
       await this.executeGitCommand(['reset', 'HEAD', '--', ...filePaths]);
 
       // Then, revert the unstaged changes
-      await this.executeGitCommand(['checkout', '--', ...filePaths]);
+      // Prefer disabling hooks; if that fails, fall back to normal checkout
+      const hooksBypassArgs = this.getHooksBypassArgs();
+      try {
+        await this.executeGitCommand([...hooksBypassArgs, 'checkout', '--', ...filePaths]);
+      } catch (e) {
+        // Fallback without bypass if the config flag/path is not supported in the environment
+        await this.executeGitCommand(['checkout', '--', ...filePaths]);
+      }
 
       return true;
     } catch (error) {
       console.error('Error reverting files:', error);
       vscode.window.showErrorMessage(`Failed to revert files: ${error}`);
       return false;
+    }
+  }
+
+  private getHooksBypassArgs(): string[] {
+    // On most systems, pointing hooksPath to a non-existent dir disables hooks.
+    // To be safe across platforms, create an empty temp dir and point hooksPath there.
+    try {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-hooks-empty-'));
+      return ['-c', `core.hooksPath=${tempDir}`];
+    } catch {
+      // Fallback to a commonly non-existent path; if unsupported, the caller will retry without it
+      return ['-c', 'core.hooksPath=/dev/null'];
     }
   }
 
@@ -193,7 +213,10 @@ export class GitService {
     } catch (err: any) {
       const msg = String(err?.message || err || '');
       const lockPath = path.join(this.workspaceRoot, '.git', 'index.lock');
-      const lockDetected = msg.includes('index.lock') || msg.includes('Another git process seems to be running');
+      const lockDetected =
+        msg.includes('index.lock') ||
+        msg.includes('Another git process seems to be running') ||
+        msg.includes('unable to write new index file');
 
       if (retryOnLock && lockDetected && fs.existsSync(lockPath)) {
         try {

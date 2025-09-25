@@ -351,6 +351,73 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }),
 
+    // Revert a single file from context menu
+    vscode.commands.registerCommand('jetbrains-commit-manager.revertFile', async (arg?: any) => {
+      let fileToRevert: FileItem | undefined;
+      const allFiles = treeProvider.getAllFiles();
+
+      if (typeof arg === 'string') {
+        fileToRevert = allFiles.find((f) => f.id === arg);
+      } else if (arg && arg.file) {
+        // Invoked from context menu: arg is FileTreeItem
+        fileToRevert = arg.file as FileItem;
+      } else if (arg && arg.resourceUri) {
+        const fsPath: string = arg.resourceUri.fsPath as string;
+        // match by path tail relative path presence
+        fileToRevert = allFiles.find((f) => fsPath.endsWith(f.path));
+      }
+      if (!fileToRevert) {
+        vscode.window.showWarningMessage('No file selected to revert.');
+        return;
+      }
+
+      const confirm = await vscode.window.showWarningMessage(
+        `Revert changes in ${fileToRevert.name}? This discards uncommitted changes.`,
+        { modal: true },
+        'Revert'
+      );
+      if (confirm !== 'Revert') {
+        return;
+      }
+
+      const success = await gitService.revertFiles([fileToRevert]);
+      if (success) {
+        vscode.window.showInformationMessage(`Reverted ${fileToRevert.name}`);
+        treeProvider.refresh();
+        updateAllCommitUI();
+      }
+    }),
+
+    // Revert all files in a changelist from context menu
+    vscode.commands.registerCommand('jetbrains-commit-manager.revertChangelist', async (changelistItem?: any) => {
+      if (!changelistItem || !changelistItem.changelist) {
+        return;
+      }
+      const changelistId: string = changelistItem.changelist.id;
+      const changelistName: string = changelistItem.changelist.name;
+      const files = treeProvider.getChangelists().find((c) => c.id === changelistId)?.files || [];
+      if (files.length === 0) {
+        vscode.window.showInformationMessage('No files to revert in this changelist.');
+        return;
+      }
+
+      const confirm = await vscode.window.showWarningMessage(
+        `Revert all ${files.length} file(s) in "${changelistName}"? This discards uncommitted changes.`,
+        { modal: true },
+        'Revert'
+      );
+      if (confirm !== 'Revert') {
+        return;
+      }
+
+      const success = await gitService.revertFiles(files);
+      if (success) {
+        vscode.window.showInformationMessage(`Reverted ${files.length} file(s) in "${changelistName}"`);
+        treeProvider.refresh();
+        updateAllCommitUI();
+      }
+    }),
+
     vscode.commands.registerCommand('jetbrains-commit-manager.selectAllFiles', () => {
       treeProvider.selectAllFiles();
       treeProvider.refresh();

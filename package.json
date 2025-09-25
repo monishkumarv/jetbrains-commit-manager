@@ -103,6 +103,18 @@
         "title": "Revert Selected Files",
         "category": "JetBrains Commit Manager",
         "icon": "$(discard)"
+      },
+      {
+        "command": "jetbrains-commit-manager.revertFile",
+        "title": "Revert File",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "jetbrains-commit-manager.revertChangelist",
+        "title": "Revert Changelist",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(discard)"
       }
     ],
     "viewsContainers": {
@@ -153,6 +165,11 @@
       ],
       "view/item/context": [
         {
+          "command": "jetbrains-commit-manager.revertChangelist",
+          "when": "view == jetbrains-commit-manager.changelists && (viewItem == changelist || viewItem == defaultChangelist)",
+          "group": "inline@1"
+        },
+        {
           "command": "jetbrains-commit-manager.renameChangelist",
           "when": "view == jetbrains-commit-manager.changelists && viewItem == changelist",
           "group": "1_modification"
@@ -161,6 +178,11 @@
           "command": "jetbrains-commit-manager.deleteChangelist",
           "when": "view == jetbrains-commit-manager.changelists && viewItem == changelist && viewItem != defaultChangelist",
           "group": "inline@2"
+        },
+        {
+          "command": "jetbrains-commit-manager.revertFile",
+          "when": "view == jetbrains-commit-manager.changelists && viewItem == file",
+          "group": "inline@1"
         }
       ]
     }
