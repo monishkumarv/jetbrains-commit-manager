@@ -26,7 +26,26 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onView:jetbrains-commit-manager.changelists",
+    "workspaceContains:.git",
+    "onCommand:jetbrains-commit-manager.openCommitManager",
+    "onCommand:jetbrains-commit-manager.test",
+    "onCommand:jetbrains-commit-manager.createChangelist",
+    "onCommand:jetbrains-commit-manager.deleteChangelist",
+    "onCommand:jetbrains-commit-manager.commitSelectedFiles",
+    "onCommand:jetbrains-commit-manager.collapseAll",
+    "onCommand:jetbrains-commit-manager.moveFileToChangelist",
+    "onCommand:jetbrains-commit-manager.toggleFileSelection",
+    "onCommand:jetbrains-commit-manager.refresh",
+    "onCommand:jetbrains-commit-manager.selectAllFiles",
+    "onCommand:jetbrains-commit-manager.deselectAllFiles",
+    "onCommand:jetbrains-commit-manager.commitFromStatusBar",
+    "onCommand:jetbrains-commit-manager.updateCommitMessage",
+    "onCommand:jetbrains-commit-manager.toggleAutoStage",
+    "onCommand:jetbrains-commit-manager.renameChangelist",
+    "onCommand:jetbrains-commit-manager.revertSelectedFiles",
+    "onCommand:jetbrains-commit-manager.revertFile",
+    "onCommand:jetbrains-commit-manager.revertChangelist"
   ],
   "main": "./out/extension.js",
   "contributes": {
