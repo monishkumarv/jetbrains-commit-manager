@@ -35,14 +35,12 @@ export class WebviewCommitManager {
     this.panel.webview.html = this.getWebviewContent();
 
     this.panel.webview.onDidReceiveMessage(async (message) => {
-      console.log('Received message:', message);
       switch (message.command) {
         case 'refresh':
           await this.loadGitStatus();
           this.panel!.webview.html = this.getWebviewContent();
           break;
         case 'createChangelist':
-          console.log('Creating changelist:', message.name, message.description);
           await this.createChangelist(message.name, message.description);
           vscode.window.showInformationMessage(`Created changelist: ${message.name}`);
           this.panel!.webview.html = this.getWebviewContent();
@@ -508,7 +506,6 @@ export class WebviewCommitManager {
           }
           
           function createChangelist() {
-            console.log('createChangelist() called');
             showCreateChangelistForm();
           }
           
@@ -586,7 +583,6 @@ export class WebviewCommitManager {
               name: name, 
               description: description || undefined
             };
-            console.log('Sending message:', message);
             vscode.postMessage(message);
             
             hideCreateChangelistForm();

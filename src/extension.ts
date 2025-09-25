@@ -15,15 +15,12 @@ let isExpanded: boolean = false; // Track expand/collapse state
 let commitUI: CommitUI;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('JetBrains Commit Manager extension activating...');
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!workspaceRoot) {
-    console.log('No workspace folder found, showing warning message');
     vscode.window.showWarningMessage('No workspace folder found. Please open a folder to use the commit manager.');
   }
 
   if (workspaceRoot) {
-    console.log('Workspace root found:', workspaceRoot);
     treeProvider = new NativeTreeProvider(workspaceRoot);
     gitService = new GitService(workspaceRoot);
 
@@ -494,7 +491,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Test command to verify extension is working
     vscode.commands.registerCommand('jetbrains-commit-manager.test', () => {
-      console.log('Test command executed - extension is working!');
       vscode.window.showInformationMessage('JetBrains Commit Manager extension is working!');
     }),
   ];
@@ -529,13 +525,11 @@ export function activate(context: vscode.ExtensionContext) {
         // Only auto-stage files that are already tracked by Git
         const isTracked = await gitService.isFileTracked(relativePath);
         if (!isTracked) {
-          console.log(`Skipping auto-stage for untracked file: ${relativePath}`);
           return;
         }
 
         try {
           await gitService.stageFile(relativePath);
-          console.log(`Auto-staged tracked file: ${relativePath}`);
         } catch (error) {
           console.error(`Failed to auto-stage file ${relativePath}:`, error);
         }
@@ -562,13 +556,11 @@ export function activate(context: vscode.ExtensionContext) {
         // Only auto-stage files that are already tracked by Git
         const isTracked = await gitService.isFileTracked(relativePath);
         if (!isTracked) {
-          console.log(`Skipping auto-stage for untracked file: ${relativePath}`);
           return;
         }
 
         try {
           await gitService.stageFile(relativePath);
-          console.log(`Auto-staged tracked file: ${relativePath}`);
         } catch (error) {
           console.error(`Failed to auto-stage file ${relativePath}:`, error);
         }
