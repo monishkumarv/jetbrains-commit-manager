@@ -53,6 +53,6 @@ All notable changes to the "JetBrains Commit Manager" extension will be document
 
 ### Requirements
 
-- VS Code 1.103.0 or higher
+- VS Code 1.60.0 or higher
 - Git repository in workspace
 - Git installed and accessible from command line

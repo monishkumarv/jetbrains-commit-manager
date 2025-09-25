@@ -42,31 +42,32 @@ Try the extension from Visual Studio Code Marketplace here - [link](https://mark
    - Or focus the view from the Activity Bar when pinned
 
 2. **View Your Changes**
+
    - The sidebar shows a tree of your changelists and files
    - All modified files appear in the default changelist
    - Unversioned files appear in the "Unversioned Files" section
 
-4. Create a New Changelist
+3. Create a New Changelist
 
    - Run "JetBrains Commit Manager: Create Changelist"
    - Enter a name (and optional description)
 
-5. Move Files Between Changelists
+4. Move Files Between Changelists
 
    - **Drag & Drop**: Drag files from one changelist to another
    - **Context Menu**: Right-click a file → "Move File to Changelist"
 
-6. Delete a Changelist
+5. Delete a Changelist
 
    - Right-click a changelist → "Delete Changelist"
    - Files are moved to the default changelist
 
-7. Select Files for Commit
+6. Select Files for Commit
 
    - Click a file to toggle its selection (checkbox)
    - Use "Select All Files" or "Deselect All Files" for bulk operations
 
-8. Commit Selected Files
+7. Commit Selected Files
 
    - Select files in the tree
    - Click the commit button from the status bar
@@ -138,7 +139,7 @@ npm test
 
 ## Requirements
 
-- VS Code 1.103.0 or higher
+- VS Code 1.60.0 or higher
 - Git repository in the workspace
 - Git installed and accessible from the command line
 
