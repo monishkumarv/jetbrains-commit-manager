@@ -3,8 +3,20 @@
   "displayName": "Jetbrains Commit Manager",
   "description": "A commit manager that replicates Jetbrains IDE commit managements",
   "version": "0.0.2",
+  "publisher": "your-publisher-id",
+  "icon": "resources/commit-manager-icon.svg",
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "commit",
+    "changelist",
+    "jetbrains",
+    "intellij",
+    "scm",
+    "vcs"
+  ],
   "engines": {
-    "vscode": "^1.99.0"
+    "vscode": "^1.103.0"
   },
   "categories": [
     "SCM Providers",
