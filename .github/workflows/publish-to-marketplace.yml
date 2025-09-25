@@ -9,32 +9,19 @@ on:
         default: 'patch'
 
 jobs:
-  publish:
+  version-bump-publish:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Needed for versioning & tagging
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '20'
           cache: 'npm'
-
-      - name: Show npm version and config
-        run: |
-          npm -v
-          npm config set fund false
-          npm config set audit false
-          npm config set registry https://registry.npmjs.org
-
-      - name: Clean npm cache
-        run: npm cache clean --force
-
+          
       - name: Install dependencies
         run: npm ci
 
