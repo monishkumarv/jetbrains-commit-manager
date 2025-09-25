@@ -4,7 +4,7 @@
   "description": "A commit manager that replicates Jetbrains IDE commit managements",
   "version": "0.0.1",
   "publisher": "monishkumarv",
-  "icon": "resources/commit-manager-icon.svg",
+  "icon": "resources/commit-manager-icon.png",
   "repository": {
     "url": "https://github.com/monishkumarv/jetbrains-commit-manager"
   },
