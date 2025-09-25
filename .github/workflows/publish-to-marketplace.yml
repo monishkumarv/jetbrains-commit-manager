@@ -1,0 +1,44 @@
+name: Version Bump & Publish Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release type (patch, minor, major)"
+        required: true
+        default: "patch"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Needed for versioning & tagging
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Bump version and push tag
+        uses: phips28/gh-action-bump-version@v11
+        with:
+          tag-prefix: "v"
+          bump-type: ${{ github.event.inputs.release_type }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install VSCE and OVSX
+        run: npm install -g @vscode/vsce ovsx
+
+      - name: Publish to VS Code Marketplace
+        run: vsce publish --pat ${{ secrets.VSCE_TOKEN }}
+
+      - name: Publish to OpenVSX
+        run: ovsx publish -p ${{ secrets.OVSX_TOKEN }}
