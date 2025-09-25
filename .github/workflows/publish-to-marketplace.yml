@@ -8,6 +8,9 @@ on:
         required: true
         default: 'patch'
 
+permissions:
+  contents: write
+
 jobs:
   version-bump-publish:
     runs-on: ubuntu-latest
@@ -15,13 +18,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for versioning & tagging
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
 
