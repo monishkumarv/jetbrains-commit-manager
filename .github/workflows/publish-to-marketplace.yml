@@ -35,9 +35,21 @@ jobs:
 
       - name: Bump version and push tag
         uses: phips28/gh-action-bump-version@master
+        id: bump_version
         with:
           tag-prefix: 'v'
           version-type: ${{ github.event.inputs.release_type }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.bump_version.outputs.newTag }}
+          name: ${{ steps.bump_version.outputs.newTag }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
