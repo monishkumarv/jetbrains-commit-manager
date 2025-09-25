@@ -2,6 +2,8 @@
 
 A VS Code extension that brings JetBrains-like commit workflows (IntelliJ IDEA, GoLand, etc.) to VS Code: organize changes into changelists, drag & drop files between them, select exactly what to commit, and work efficiently from the status bar or command palette.
 
+Try the extension from Visual Studio Code Marketplace here - [link](https://marketplace.visualstudio.com/items?itemName=monishkumarv.jetbrains-commit-manager)
+
 ## Features
 
 ### 🎯 JetBrains-Style Commit Management
@@ -32,9 +34,7 @@ A VS Code extension that brings JetBrains-like commit workflows (IntelliJ IDEA, 
 - **Manual Refresh**: Refresh command available any time
 - **Auto-Stage Tracked Files**: On change/create, tracked files can be auto-staged (configurable)
 
-## Usage
-
-### Getting Started
+## Getting Started
 
 1. **Open the Commit Manager**
 
@@ -46,50 +46,30 @@ A VS Code extension that brings JetBrains-like commit workflows (IntelliJ IDEA, 
    - All modified files appear in the default changelist
    - Unversioned files appear in the "Unversioned Files" section
 
-### Managing Changelists
+4. Create a New Changelist
 
-#### Create a New Changelist
+   - Run "JetBrains Commit Manager: Create Changelist"
+   - Enter a name (and optional description)
 
-1. Run "JetBrains Commit Manager: Create Changelist"
-2. Enter a name (and optional description)
+5. Move Files Between Changelists
 
-#### Move Files Between Changelists
+   - **Drag & Drop**: Drag files from one changelist to another
+   - **Context Menu**: Right-click a file → "Move File to Changelist"
 
-- **Drag & Drop**: Drag files from one changelist to another
-- **Context Menu**: Right-click a file → "Move File to Changelist"
+6. Delete a Changelist
 
-#### Delete a Changelist
+   - Right-click a changelist → "Delete Changelist"
+   - Files are moved to the default changelist
 
-- Right-click a changelist → "Delete Changelist"
-- Files are moved to the default changelist
+7. Select Files for Commit
 
-### Committing Files
+   - Click a file to toggle its selection (checkbox)
+   - Use "Select All Files" or "Deselect All Files" for bulk operations
 
-#### Select Files for Commit
+8. Commit Selected Files
 
-- Click a file to toggle its selection (checkbox)
-- Use "Select All Files" or "Deselect All Files" for bulk operations
-
-#### Commit Selected Files
-
-**Status Bar (Recommended)**
-
-1. Select files in the tree
-2. Click the status bar message input (📝) to enter your commit message
-3. Run "JetBrains Commit Manager: Commit from Status Bar" or click the status bar commit button
-
-**Command Palette**
-
-1. Select files in the tree
-2. Run "JetBrains Commit Manager: Commit Selected Files" and enter your message
-
-### File Status Indicators
-
-- 🔄 **Modified**: Files that have been changed
-- ➕ **Added**: New files added to version control
-- 🗑️ **Deleted**: Files that have been removed
-- ❓ **Untracked**: New files not yet in version control
-- 🔄 **Renamed**: Files that have been renamed
+   - Select files in the tree
+   - Click the commit button from the status bar
 
 ## Commands
 
@@ -110,12 +90,6 @@ A VS Code extension that brings JetBrains-like commit workflows (IntelliJ IDEA, 
 | `JetBrains Commit Manager: Commit from Status Bar`  | Commits using the status bar button         |
 | `JetBrains Commit Manager: Update Commit Message`   | Updates the status bar commit message       |
 | `JetBrains Commit Manager: Toggle Auto-Stage Files` | Toggles automatic staging for tracked files |
-
-## Requirements
-
-- VS Code 1.103.0 or higher
-- Git repository in the workspace
-- Git installed and accessible from the command line
 
 ## Configuration
 
@@ -162,13 +136,11 @@ Then press F5 in VS Code to launch the extension in debug mode.
 npm test
 ```
 
-## Contributing
+## Requirements
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+- VS Code 1.103.0 or higher
+- Git repository in the workspace
+- Git installed and accessible from the command line
 
 ## License
 
@@ -176,8 +148,4 @@ This extension is licensed under the MIT License.
 
 ## Acknowledgments
 
-Inspired by the excellent commit management features in JetBrains IDEs.
-
----
-
-Want to add a screenshot or gif? Drop assets into `resources/` and reference them here.
+Inspired by the commit management features in JetBrains IDEs.
