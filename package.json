@@ -2,9 +2,12 @@
   "name": "jetbrains-commit-manager",
   "displayName": "Jetbrains Commit Manager",
   "description": "A commit manager that replicates Jetbrains IDE commit managements",
-  "version": "0.0.2",
-  "publisher": "your-publisher-id",
+  "version": "0.0.1",
+  "publisher": "monishkumarv",
   "icon": "resources/commit-manager-icon.svg",
+  "repository": {
+    "url": "https://github.com/monishkumarv/jetbrains-commit-manager"
+  },
   "license": "MIT",
   "keywords": [
     "git",
