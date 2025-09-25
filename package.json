@@ -1,0 +1,197 @@
+{
+  "name": "jetbrains-commit-manager",
+  "displayName": "Jetbrains Commit Manager",
+  "description": "A commit manager that replicates Jetbrains IDE commit managements",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jetbrains-commit-manager.openCommitManager",
+        "title": "Open Commit Manager",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.test",
+        "title": "Test Extension",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.createChangelist",
+        "title": "Create Changelist",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(add)"
+      },
+      {
+        "command": "jetbrains-commit-manager.deleteChangelist",
+        "title": "Delete Changelist",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "jetbrains-commit-manager.commitSelectedFiles",
+        "title": "Commit Selected Files",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(check)"
+      },
+      {
+        "command": "jetbrains-commit-manager.collapseAll",
+        "title": "Collapse All",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(collapse-all)"
+      },
+      {
+        "command": "jetbrains-commit-manager.moveFileToChangelist",
+        "title": "Move File to Changelist",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.toggleFileSelection",
+        "title": "Toggle File Selection",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.refresh",
+        "title": "Refresh",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "jetbrains-commit-manager.selectAllFiles",
+        "title": "Select All Files",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.deselectAllFiles",
+        "title": "Deselect All Files",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.commitFromStatusBar",
+        "title": "Commit from Status Bar",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.updateCommitMessage",
+        "title": "Update Commit Message",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.toggleAutoStage",
+        "title": "Toggle Auto-Stage Files",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "jetbrains-commit-manager.renameChangelist",
+        "title": "Rename Changelist",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "jetbrains-commit-manager.revertSelectedFiles",
+        "title": "Revert Selected Files",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(discard)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "jetbrains-commit-manager",
+          "title": "Commit Manager",
+          "icon": "resources/commit-manager-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "jetbrains-commit-manager": [
+        {
+          "id": "jetbrains-commit-manager.changelists",
+          "name": "Changelists",
+          "when": "workspaceFolderCount > 0"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "jetbrains-commit-manager.commitSelectedFiles",
+          "when": "view == jetbrains-commit-manager.changelists",
+          "group": "navigation@1"
+        },
+        {
+          "command": "jetbrains-commit-manager.refresh",
+          "when": "view == jetbrains-commit-manager.changelists",
+          "group": "navigation@2"
+        },
+        {
+          "command": "jetbrains-commit-manager.revertSelectedFiles",
+          "when": "view == jetbrains-commit-manager.changelists",
+          "group": "navigation@3"
+        },
+        {
+          "command": "jetbrains-commit-manager.createChangelist",
+          "when": "view == jetbrains-commit-manager.changelists",
+          "group": "navigation@4"
+        },
+        {
+          "when": "false",
+          "command": "jetbrains-commit-manager.collapseAll",
+          "group": "navigation@5"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "jetbrains-commit-manager.renameChangelist",
+          "when": "view == jetbrains-commit-manager.changelists && viewItem == changelist",
+          "group": "1_modification"
+        },
+        {
+          "command": "jetbrains-commit-manager.deleteChangelist",
+          "when": "view == jetbrains-commit-manager.changelists && viewItem == changelist && viewItem != defaultChangelist",
+          "group": "inline@2"
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "title": "JetBrains Commit Manager",
+    "properties": {
+      "jetbrains-commit-manager.autoStageFiles": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically stage modified files that are already tracked by Git (untracked files are not auto-staged)"
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.32.0",
+    "typescript": "^5.9.2",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
