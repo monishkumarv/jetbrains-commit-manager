@@ -24,6 +24,7 @@ Try the extension from Visual Studio Code Marketplace here - [link](https://mark
 
 - **Checkbox Selection**: Click files to include/exclude from the next commit
 - **Bulk Selection**: Quickly select or deselect all files
+- **Smart Commit Button**: Commit button is only enabled when files are selected, with helpful tooltips
 - **Status Bar Commit**: Enter commit message and commit from the status bar
 - **Command Palette**: Commit via commands if you prefer keyboard-only flow
 
@@ -69,7 +70,8 @@ Try the extension from Visual Studio Code Marketplace here - [link](https://mark
 
 7. Commit Selected Files
 
-   - Select files in the tree
+   - Select files in the tree using checkboxes
+   - The commit button will be enabled and show "Commit Selected Files"
    - Click the commit button from the status bar
 
 ## Commands

@@ -32,6 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
       dragAndDropController: treeProvider,
     });
 
+    // Listen for tree data changes to update commit button context
+    treeProvider.onDidChangeTreeData(() => {
+      updateCommitButtonContext();
+    });
+
     // Handle collapse all to toggle to expand all
     treeView.onDidCollapseElement((e) => {
       // When user manually collapses items, update our state and the changelist state
@@ -67,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
     treeView.onDidChangeCheckboxState((e) => {
       treeProvider.onDidChangeCheckboxState(e);
       updateAllCommitUI();
+      updateCommitButtonContext();
     });
 
     // Removed force expand wiring
@@ -102,7 +108,17 @@ export function activate(context: vscode.ExtensionContext) {
     // Create status bar items for commit functionality
     createCommitStatusBarItems();
 
+    // Initialize commit button context
+    updateCommitButtonContext();
+
     // Commit webview removed; commit via title button/status bar/command palette
+  }
+
+  // Function to update commit button context based on file selection
+  function updateCommitButtonContext() {
+    const selectedFiles = treeProvider.getSelectedFiles();
+    const hasSelectedFiles = selectedFiles.length > 0;
+    vscode.commands.executeCommand('setContext', 'jetbrains-commit-manager.hasSelectedFiles', hasSelectedFiles);
   }
 
   // Register commands
@@ -259,6 +275,7 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showInformationMessage(`Successfully committed ${selectedFiles.length} file(s)`);
           treeProvider.refresh();
           updateAllCommitUI();
+          updateCommitButtonContext();
         } else {
           vscode.window.showErrorMessage('Failed to commit files. Check the output panel for details.');
         }
@@ -298,6 +315,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         treeProvider.refresh();
         updateAllCommitUI();
+        updateCommitButtonContext();
       }
     }),
 
@@ -305,6 +323,7 @@ export function activate(context: vscode.ExtensionContext) {
       treeProvider.toggleFileSelection(fileId);
       treeProvider.refresh();
       updateAllCommitUI();
+      updateCommitButtonContext();
     }),
 
     vscode.commands.registerCommand('jetbrains-commit-manager.refresh', () => {
@@ -342,6 +361,7 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showInformationMessage(`Successfully reverted ${selectedFiles.length} file(s)`);
           treeProvider.refresh();
           updateAllCommitUI();
+          updateCommitButtonContext();
         } else {
           vscode.window.showErrorMessage('Failed to revert files. Check the output panel for details.');
         }
@@ -382,6 +402,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(`Reverted ${fileToRevert.name}`);
         treeProvider.refresh();
         updateAllCommitUI();
+        updateCommitButtonContext();
       }
     }),
 
@@ -412,6 +433,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(`Reverted ${files.length} file(s) in "${changelistName}"`);
         treeProvider.refresh();
         updateAllCommitUI();
+        updateCommitButtonContext();
       }
     }),
 
@@ -419,12 +441,14 @@ export function activate(context: vscode.ExtensionContext) {
       treeProvider.selectAllFiles();
       treeProvider.refresh();
       updateAllCommitUI();
+      updateCommitButtonContext();
     }),
 
     vscode.commands.registerCommand('jetbrains-commit-manager.deselectAllFiles', () => {
       treeProvider.deselectAllFiles();
       treeProvider.refresh();
       updateAllCommitUI();
+      updateCommitButtonContext();
     }),
 
     // New command for status bar commit button
@@ -456,6 +480,7 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showInformationMessage(`Successfully committed ${selectedFiles.length} file(s)`);
           treeProvider.refresh();
           updateAllCommitUI();
+          updateCommitButtonContext();
           // Clear the commit message input
           commitMessageInput.text = '📝 ';
         } else {

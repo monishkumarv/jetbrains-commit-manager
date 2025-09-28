@@ -76,7 +76,8 @@
         "command": "jetbrains-commit-manager.commitSelectedFiles",
         "title": "Commit Selected Files",
         "category": "JetBrains Commit Manager",
-        "icon": "$(check)"
+        "icon": "$(check)",
+        "tooltip": "Select files to commit"
       },
       {
         "command": "jetbrains-commit-manager.collapseAll",
@@ -173,7 +174,7 @@
       "view/title": [
         {
           "command": "jetbrains-commit-manager.commitSelectedFiles",
-          "when": "view == jetbrains-commit-manager.changelists",
+          "when": "view == jetbrains-commit-manager.changelists && jetbrains-commit-manager.hasSelectedFiles",
           "group": "navigation@1"
         },
         {
