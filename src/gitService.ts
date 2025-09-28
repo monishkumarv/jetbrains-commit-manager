@@ -23,7 +23,12 @@ export class GitService {
 
       for (const line of lines) {
         const status = line.substring(0, 2);
-        const path = line.substring(3);
+        // More robust path extraction - find the first space after the status and take everything after it
+        const spaceIndex = line.indexOf(' ', 2);
+        const path = spaceIndex !== -1 ? line.substring(spaceIndex + 1) : line.substring(3);
+
+        // Debug logging to help track path extraction
+        console.log(`Git status line: "${line}" -> status: "${status}", path: "${path}"`);
 
         const fileItem: FileItem = {
           id: this.generateFileId(path),
