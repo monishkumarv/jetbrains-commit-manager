@@ -180,6 +180,192 @@ export class GitService {
     }
   }
 
+  async stashFiles(files: FileItem[], message?: string): Promise<boolean> {
+    try {
+      console.log('=== STASH DEBUG START ===');
+      console.log(
+        'Selected files for stash:',
+        files.map((f) => ({ path: f.path, status: f.status }))
+      );
+      console.log('Stash message:', message);
+
+      if (files.length === 0) {
+        throw new Error('No files selected for stash');
+      }
+
+      // Clear any existing lock files before starting
+      console.log('Clearing lock files...');
+      await this.clearLockFiles();
+
+      // Check current git status before any operations
+      console.log('Checking current git status...');
+      const { stdout: statusBefore } = await this.executeGitCommand(['status', '--porcelain']);
+      console.log('Git status before stash:', statusBefore);
+
+      // Check current staged files
+      console.log('Checking current staged files...');
+      const { stdout: stagedBefore } = await this.executeGitCommand(['diff', '--cached', '--name-only']);
+      console.log('Staged files before stash:', stagedBefore);
+
+      // The direct stash approach with file paths doesn't work as expected
+      // It stashes all staged files PLUS the specified files, not just the specified files
+      // So we need to use the staging approach which properly isolates only selected files
+      console.log('Using staging approach to ensure only selected files are stashed...');
+      return await this.stashFilesWithStaging(files, message);
+    } catch (error) {
+      console.error('Error stashing files:', error);
+      console.log('=== STASH DEBUG END (ERROR) ===');
+      vscode.window.showErrorMessage(`Failed to stash files: ${error}`);
+      return false;
+    }
+  }
+
+  private async stashFilesWithStaging(files: FileItem[], message?: string): Promise<boolean> {
+    try {
+      console.log('=== STAGING APPROACH DEBUG START ===');
+
+      // Get current staged files to restore later
+      const { stdout: stagedFilesOutput } = await this.executeGitCommand(['diff', '--cached', '--name-only']);
+      const currentStagedFiles = stagedFilesOutput
+        .trim()
+        .split('\n')
+        .filter((f) => f.length > 0);
+
+      console.log('Current staged files before reset:', currentStagedFiles);
+
+      // Get all modified files to track what we need to restore
+      const { stdout: allModifiedFiles } = await this.executeGitCommand(['diff', '--name-only']);
+      const modifiedFiles = allModifiedFiles
+        .trim()
+        .split('\n')
+        .filter((f) => f.length > 0);
+      console.log('All modified files in working directory:', modifiedFiles);
+
+      // Create a temporary commit with only the selected files
+      const selectedFilePaths = files.map((f) => f.path);
+      console.log('Selected file paths to stash:', selectedFilePaths);
+
+      // First, unstage all files
+      if (currentStagedFiles.length > 0) {
+        console.log('Unstaging all files...');
+        await this.executeGitCommand(['reset', 'HEAD']);
+      }
+
+      // Stage only the selected files
+      console.log('Staging only selected files...');
+      for (const file of files) {
+        let retryCount = 0;
+        const maxRetries = 3;
+        console.log(`Staging file: ${file.path} (status: ${file.status})`);
+
+        while (retryCount < maxRetries) {
+          try {
+            await this.clearLockFiles(); // Clear locks before each operation
+
+            switch (file.status) {
+              case FileStatus.UNTRACKED:
+                console.log(`Adding untracked file: ${file.path}`);
+                await this.executeGitCommand(['add', '--', file.path]);
+                break;
+              case FileStatus.ADDED:
+              case FileStatus.MODIFIED:
+              case FileStatus.RENAMED:
+                console.log(`Adding modified file: ${file.path}`);
+                await this.executeGitCommand(['add', '--', file.path]);
+                break;
+              case FileStatus.DELETED:
+                console.log(`Removing deleted file: ${file.path}`);
+                await this.executeGitCommand(['rm', '--', file.path]);
+                break;
+              default:
+                console.log(`Adding file (default): ${file.path}`);
+                await this.executeGitCommand(['add', '--', file.path]);
+            }
+            console.log(`Successfully staged: ${file.path}`);
+            break; // Success, exit retry loop
+          } catch (error) {
+            retryCount++;
+            console.log(`Failed to stage ${file.path}, retry ${retryCount}/${maxRetries}:`, error);
+            if (retryCount >= maxRetries) {
+              throw error;
+            }
+            // Wait a bit before retrying
+            await new Promise((resolve) => setTimeout(resolve, 100 * retryCount));
+          }
+        }
+      }
+
+      // Check what's staged after our operations
+      const { stdout: stagedAfter } = await this.executeGitCommand(['diff', '--cached', '--name-only']);
+      console.log('Files staged after our operations:', stagedAfter);
+
+      // Create a stash with only the staged files (our selected files)
+      const stashArgs = ['stash', 'push', '--staged'];
+      if (message) {
+        stashArgs.push('-m', message);
+      }
+      console.log('Creating stash with args (--staged):', stashArgs);
+
+      await this.executeGitCommand(stashArgs);
+      console.log('Stash created successfully');
+
+      // Check what was actually stashed
+      const { stdout: stashList } = await this.executeGitCommand(['stash', 'list', '-1']);
+      console.log('Latest stash:', stashList);
+
+      const { stdout: stashShow } = await this.executeGitCommand(['stash', 'show', '--name-only', 'stash@{0}']);
+      console.log('Files in latest stash:', stashShow);
+
+      // Now restore the original state: re-stage all the files that were staged before
+      console.log('Restoring original staged files...');
+      if (currentStagedFiles.length > 0) {
+        for (const filePath of currentStagedFiles) {
+          try {
+            console.log(`Restoring to staging: ${filePath}`);
+            await this.clearLockFiles();
+            await this.executeGitCommand(['add', '--', filePath]);
+          } catch (e) {
+            console.log(`Failed to restore ${filePath} to staging:`, e);
+            // File might have been deleted or changed, ignore
+          }
+        }
+      }
+
+      console.log('=== STAGING APPROACH DEBUG END (SUCCESS) ===');
+      return true;
+    } catch (error) {
+      console.error('Error in staging approach:', error);
+      console.log('=== STAGING APPROACH DEBUG END (ERROR) ===');
+      throw error;
+    }
+  }
+
+  private async clearLockFiles(): Promise<void> {
+    const lockPaths = [
+      path.join(this.workspaceRoot, '.git', 'index.lock'),
+      path.join(this.workspaceRoot, '.git', 'refs', 'heads', '.lock'),
+      path.join(this.workspaceRoot, '.git', 'MERGE_HEAD.lock'),
+      path.join(this.workspaceRoot, '.git', 'MERGE_MODE.lock'),
+      path.join(this.workspaceRoot, '.git', 'MERGE_MSG.lock'),
+    ];
+
+    console.log('Checking for lock files...');
+    for (const lockPath of lockPaths) {
+      try {
+        if (fs.existsSync(lockPath)) {
+          console.log(`Found lock file: ${lockPath}`);
+          fs.unlinkSync(lockPath);
+          console.log(`Removed lock file: ${lockPath}`);
+        } else {
+          console.log(`No lock file at: ${lockPath}`);
+        }
+      } catch (error) {
+        // Ignore errors when removing lock files
+        console.warn(`Could not remove lock file ${lockPath}:`, error);
+      }
+    }
+  }
+
   private getHooksBypassArgs(): string[] {
     // On most systems, pointing hooksPath to a non-existent dir disables hooks.
     // To be safe across platforms, create an empty temp dir and point hooksPath there.
@@ -216,7 +402,11 @@ export class GitService {
       const lockDetected =
         msg.includes('index.lock') ||
         msg.includes('Another git process seems to be running') ||
-        msg.includes('unable to write new index file');
+        msg.includes('unable to write new index file') ||
+        msg.includes('Unable to create') ||
+        msg.includes('File exists') ||
+        msg.includes('lock') ||
+        msg.includes('fatal:');
 
       if (retryOnLock && lockDetected && fs.existsSync(lockPath)) {
         try {

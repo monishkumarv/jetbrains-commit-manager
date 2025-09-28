@@ -28,6 +28,11 @@ Try the extension from Visual Studio Code Marketplace here - [link](https://mark
 - **Status Bar Commit**: Enter commit message and commit from the status bar
 - **Command Palette**: Commit via commands if you prefer keyboard-only flow
 
+### 📦 File Stashing
+
+- **Selective Stash**: Stash only the files you've selected, not all changes
+- **Status Bar Stash**: Stash files directly from the status bar with custom messages
+
 ### 🔄 Real-time Updates
 
 - **File Watching**: The view refreshes as files change, get created, or deleted
@@ -74,6 +79,12 @@ Try the extension from Visual Studio Code Marketplace here - [link](https://mark
    - The commit button will be enabled and show "Commit Selected Files"
    - Click the commit button from the status bar
 
+8. Stash Selected Files
+
+   - Select files in the tree using checkboxes
+   - The stash button will be enabled and show "Stash Selected Files" (next to commit button)
+   - Click the stash button to stash only the selected files
+
 ## Commands
 
 | Command                                             | Description                                 |
@@ -91,6 +102,8 @@ Try the extension from Visual Studio Code Marketplace here - [link](https://mark
 | `JetBrains Commit Manager: Revert Changelist`       | Reverts all files in a changelist           |
 | `JetBrains Commit Manager: Commit Selected Files`   | Commits the selected files                  |
 | `JetBrains Commit Manager: Commit from Status Bar`  | Commits using the status bar button         |
+| `JetBrains Commit Manager: Stash Selected Files`    | Stashes the selected files                  |
+| `JetBrains Commit Manager: Stash from Status Bar`   | Stashes using the status bar button         |
 | `JetBrains Commit Manager: Update Commit Message`   | Updates the status bar commit message       |
 | `JetBrains Commit Manager: Toggle Auto-Stage Files` | Toggles automatic staging for tracked files |
 

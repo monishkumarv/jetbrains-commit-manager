@@ -68,6 +68,9 @@ export class WebviewCommitManager {
         case 'commit':
           await this.commitSelectedFiles(message.message);
           break;
+        case 'stash':
+          await this.stashSelectedFiles(message.message);
+          break;
       }
     });
   }
@@ -225,6 +228,23 @@ export class WebviewCommitManager {
 
     if (success) {
       vscode.window.showInformationMessage(`Successfully committed ${selectedFiles.length} file(s)`);
+      await this.loadGitStatus();
+      this.panel!.webview.html = this.getWebviewContent();
+    }
+  }
+
+  private async stashSelectedFiles(message: string): Promise<void> {
+    const selectedFiles = this.getSelectedFiles();
+
+    if (selectedFiles.length === 0) {
+      vscode.window.showWarningMessage('No files selected for stash.');
+      return;
+    }
+
+    const success = await this.gitService.stashFiles(selectedFiles, message);
+
+    if (success) {
+      vscode.window.showInformationMessage(`Successfully stashed ${selectedFiles.length} file(s)`);
       await this.loadGitStatus();
       this.panel!.webview.html = this.getWebviewContent();
     }
@@ -496,6 +516,9 @@ export class WebviewCommitManager {
           <button class="btn btn-primary" onclick="commit()" ${selectedFiles.length === 0 ? 'disabled' : ''}>
             Commit
           </button>
+          <button class="btn btn-secondary" onclick="stash()" ${selectedFiles.length === 0 ? 'disabled' : ''}>
+            Stash
+          </button>
         </div>
         
         <script>
@@ -710,6 +733,19 @@ export class WebviewCommitManager {
             
             vscode.postMessage({ 
               command: 'commit', 
+              message: message 
+            });
+          }
+
+          function stash() {
+            const message = document.getElementById('commitMessage').value.trim();
+            if (!message) {
+              alert('Please enter a stash message');
+              return;
+            }
+            
+            vscode.postMessage({ 
+              command: 'stash', 
               message: message 
             });
           }

@@ -61,6 +61,12 @@ export class CommitUI {
             min-height: 60px;
           }
 
+          .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+
           .commit-input-container {
             flex: 1;
             display: flex;
@@ -91,7 +97,7 @@ export class CommitUI {
             color: var(--vscode-input-placeholderForeground);
           }
 
-          .commit-button {
+          .commit-button, .stash-button {
             padding: 8px 16px;
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
@@ -108,11 +114,23 @@ export class CommitUI {
             justify-content: center;
           }
 
+          .stash-button {
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            border: 1px solid var(--vscode-button-secondaryBackground);
+            height: 36px;
+            font-size: 12px;
+          }
+
           .commit-button:hover {
             background-color: var(--vscode-button-hoverBackground);
           }
 
-          .commit-button:disabled {
+          .stash-button:hover {
+            background-color: var(--vscode-button-secondaryHoverBackground);
+          }
+
+          .commit-button:disabled, .stash-button:disabled {
             background-color: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
             cursor: not-allowed;
@@ -151,19 +169,29 @@ export class CommitUI {
             </div>
             <div class="error-message" id="error-message"></div>
           </div>
-          <button 
-            id="commit-button" 
-            class="commit-button"
-            ${this.selectedFilesCount === 0 ? 'disabled' : ''}
-          >
-            ${this.selectedFilesCount > 0 ? `Commit (${this.selectedFilesCount})` : 'Commit'}
-          </button>
+          <div class="button-group">
+            <button 
+              id="commit-button" 
+              class="commit-button"
+              ${this.selectedFilesCount === 0 ? 'disabled' : ''}
+            >
+              ${this.selectedFilesCount > 0 ? `Commit (${this.selectedFilesCount})` : 'Commit'}
+            </button>
+            <button 
+              id="stash-button" 
+              class="stash-button"
+              ${this.selectedFilesCount === 0 ? 'disabled' : ''}
+            >
+              ${this.selectedFilesCount > 0 ? `Stash (${this.selectedFilesCount})` : 'Stash'}
+            </button>
+          </div>
         </div>
 
         <script>
           const vscode = acquireVsCodeApi();
           const commitInput = document.getElementById('commit-message');
           const commitButton = document.getElementById('commit-button');
+          const stashButton = document.getElementById('stash-button');
           const fileCount = document.getElementById('file-count');
           const errorMessage = document.getElementById('error-message');
 
@@ -181,6 +209,19 @@ export class CommitUI {
             vscode.postMessage({
               command: 'commit',
               message: message
+            });
+            hideError();
+          });
+
+          // Handle stash button click
+          stashButton.addEventListener('click', () => {
+            if (${this.selectedFilesCount} === 0) {
+              showError('No files selected for stash');
+              return;
+            }
+            vscode.postMessage({
+              command: 'stash',
+              message: commitInput.value.trim()
             });
             hideError();
           });
@@ -220,6 +261,8 @@ export class CommitUI {
                 fileCount.textContent = selectedCount > 0 ? selectedCount + '/' + totalCount + ' files selected' : 'No files selected';
                 commitButton.textContent = selectedCount > 0 ? 'Commit (' + selectedCount + ')' : 'Commit';
                 commitButton.disabled = selectedCount === 0;
+                stashButton.textContent = selectedCount > 0 ? 'Stash (' + selectedCount + ')' : 'Stash';
+                stashButton.disabled = selectedCount === 0;
                 break;
               case 'updateMessage':
                 commitInput.value = message.message;
@@ -245,6 +288,9 @@ export class CommitUI {
         case 'commit':
           await this.handleCommit(message.message);
           break;
+        case 'stash':
+          await this.handleStash(message.message);
+          break;
         case 'updateMessage':
           this.currentMessage = message.message;
           break;
@@ -258,6 +304,17 @@ export class CommitUI {
     if (this.webview) {
       this.webview.webview.postMessage({
         command: 'commitRequested',
+        message: message,
+      });
+    }
+  }
+
+  private async handleStash(message: string) {
+    // This will be handled by the extension.ts file
+    // We'll emit an event that the extension can listen to
+    if (this.webview) {
+      this.webview.webview.postMessage({
+        command: 'stashRequested',
         message: message,
       });
     }

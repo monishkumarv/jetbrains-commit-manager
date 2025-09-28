@@ -40,12 +40,14 @@
     "onCommand:jetbrains-commit-manager.selectAllFiles",
     "onCommand:jetbrains-commit-manager.deselectAllFiles",
     "onCommand:jetbrains-commit-manager.commitFromStatusBar",
+    "onCommand:jetbrains-commit-manager.stashFromStatusBar",
     "onCommand:jetbrains-commit-manager.updateCommitMessage",
     "onCommand:jetbrains-commit-manager.toggleAutoStage",
     "onCommand:jetbrains-commit-manager.renameChangelist",
     "onCommand:jetbrains-commit-manager.revertSelectedFiles",
     "onCommand:jetbrains-commit-manager.revertFile",
-    "onCommand:jetbrains-commit-manager.revertChangelist"
+    "onCommand:jetbrains-commit-manager.revertChangelist",
+    "onCommand:jetbrains-commit-manager.stashSelectedFiles"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -150,6 +152,13 @@
         "title": "Revert Changelist",
         "category": "JetBrains Commit Manager",
         "icon": "$(discard)"
+      },
+      {
+        "command": "jetbrains-commit-manager.stashSelectedFiles",
+        "title": "Stash Selected Files",
+        "category": "JetBrains Commit Manager",
+        "icon": "$(archive)",
+        "tooltip": "Stash selected files"
       }
     ],
     "viewsContainers": {
@@ -178,24 +187,29 @@
           "group": "navigation@1"
         },
         {
-          "command": "jetbrains-commit-manager.refresh",
-          "when": "view == jetbrains-commit-manager.changelists",
+          "command": "jetbrains-commit-manager.stashSelectedFiles",
+          "when": "view == jetbrains-commit-manager.changelists && jetbrains-commit-manager.hasSelectedFiles",
           "group": "navigation@2"
         },
         {
-          "command": "jetbrains-commit-manager.revertSelectedFiles",
+          "command": "jetbrains-commit-manager.refresh",
           "when": "view == jetbrains-commit-manager.changelists",
           "group": "navigation@3"
         },
         {
-          "command": "jetbrains-commit-manager.createChangelist",
+          "command": "jetbrains-commit-manager.revertSelectedFiles",
           "when": "view == jetbrains-commit-manager.changelists",
           "group": "navigation@4"
         },
         {
+          "command": "jetbrains-commit-manager.createChangelist",
+          "when": "view == jetbrains-commit-manager.changelists",
+          "group": "navigation@5"
+        },
+        {
           "when": "false",
           "command": "jetbrains-commit-manager.collapseAll",
-          "group": "navigation@5"
+          "group": "navigation@6"
         }
       ],
       "view/item/context": [

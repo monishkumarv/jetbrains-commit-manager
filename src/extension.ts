@@ -282,6 +282,54 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }),
 
+    vscode.commands.registerCommand('jetbrains-commit-manager.stashSelectedFiles', async () => {
+      const selectedFiles = treeProvider.getSelectedFiles();
+
+      if (selectedFiles.length === 0) {
+        vscode.window.showWarningMessage('No files selected for stash. Please select files first.');
+        return;
+      }
+
+      // Determine default message based on changelist selection
+      let defaultMessage = '';
+      const changelists = treeProvider.getChangelists();
+
+      // Check if all selected files are from the same changelist
+      const selectedChangelistIds = new Set(selectedFiles.map((f) => f.changelistId).filter((id) => id));
+      if (selectedChangelistIds.size === 1) {
+        const changelistId = Array.from(selectedChangelistIds)[0];
+        const changelist = changelists.find((c) => c.id === changelistId);
+        if (changelist && !changelist.isDefault) {
+          defaultMessage = changelist.name;
+        }
+      }
+
+      const message = await vscode.window.showInputBox({
+        prompt: 'Enter stash message',
+        placeHolder: defaultMessage || 'Describe your changes...',
+        value: defaultMessage,
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return 'Stash message cannot be empty';
+          }
+          return null;
+        },
+      });
+
+      if (message) {
+        const success = await gitService.stashFiles(selectedFiles, message.trim());
+
+        if (success) {
+          vscode.window.showInformationMessage(`Successfully stashed ${selectedFiles.length} file(s)`);
+          treeProvider.refresh();
+          updateAllCommitUI();
+          updateCommitButtonContext();
+        } else {
+          vscode.window.showErrorMessage('Failed to stash files. Check the output panel for details.');
+        }
+      }
+    }),
+
     vscode.commands.registerCommand('jetbrains-commit-manager.moveFileToChangelist', async (fileId?: string) => {
       let filesToMove: FileItem[] = [];
 
@@ -485,6 +533,58 @@ export function activate(context: vscode.ExtensionContext) {
           commitMessageInput.text = '📝 ';
         } else {
           vscode.window.showErrorMessage('Failed to commit files. Check the output panel for details.');
+        }
+      }
+    }),
+
+    // New command for status bar stash button
+    vscode.commands.registerCommand('jetbrains-commit-manager.stashFromStatusBar', async () => {
+      const selectedFiles = treeProvider.getSelectedFiles();
+
+      if (selectedFiles.length === 0) {
+        vscode.window.showWarningMessage('No files selected for stash. Please select files first.');
+        return;
+      }
+
+      // Determine default message based on changelist selection
+      let defaultMessage = '';
+      const changelists = treeProvider.getChangelists();
+
+      // Check if all selected files are from the same changelist
+      const selectedChangelistIds = new Set(selectedFiles.map((f) => f.changelistId).filter((id) => id));
+      if (selectedChangelistIds.size === 1) {
+        const changelistId = Array.from(selectedChangelistIds)[0];
+        const changelist = changelists.find((c) => c.id === changelistId);
+        if (changelist && !changelist.isDefault) {
+          defaultMessage = changelist.name;
+        }
+      }
+
+      // Get stash message from the input field or prompt
+      const message = await vscode.window.showInputBox({
+        prompt: 'Enter stash message',
+        placeHolder: defaultMessage || 'Describe your changes...',
+        value: defaultMessage || commitMessageInput.text.replace('📝 ', ''), // Use changelist name or current message
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return 'Stash message cannot be empty';
+          }
+          return null;
+        },
+      });
+
+      if (message) {
+        const success = await gitService.stashFiles(selectedFiles, message.trim());
+
+        if (success) {
+          vscode.window.showInformationMessage(`Successfully stashed ${selectedFiles.length} file(s)`);
+          treeProvider.refresh();
+          updateAllCommitUI();
+          updateCommitButtonContext();
+          // Clear the commit message input
+          commitMessageInput.text = '📝 ';
+        } else {
+          vscode.window.showErrorMessage('Failed to stash files. Check the output panel for details.');
         }
       }
     }),
