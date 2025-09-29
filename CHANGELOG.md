@@ -2,7 +2,44 @@
 
 All notable changes to the "JetBrains Commit Manager" extension will be documented in this file.
 
-## [0.0.2] - 2024-12-19
+## [0.0.5] - 2025-12-29
+
+### Added
+
+- **Amend Commit support**: Toggle amend in commit dialog, webview, and compact sidebar UI
+- **Push options**: Commit and Push, Amend Commit and Push
+- **Status Bar actions**: Commit and Stash directly from the status bar
+- **Commands**: `Open Diff`, `Open File`, `Update Commit Message`
+- **Changelist actions**: Rename, Revert, and Delete from context menus
+
+### Changed
+
+- **UX improvements**: Clearer button labels, inline amend indicator, improved confirmations
+- **Git integration**: Automatically sets upstream on first push when missing
+
+### Fixed
+
+- More robust error handling for commit/push/stash operations
+- Reliability improvements in changelist updates and file selection state
+
+## [0.0.4] - 2025-09-29
+
+### Added
+
+- **Smart Stashing**: Stash  selected files
+- **Context Menu Enhancements**: Quick access to file open and diff actions
+
+## [0.0.3] - 2025-09-25
+
+### Fixed
+
+- Resolved versioning issues and updated logo
+
+### Changed
+
+- **UI polish**: Improved layout and responsiveness in the commit manager view
+
+## [0.0.2] - 2025-09-25
 
 ### Added
 
@@ -18,7 +55,7 @@ All notable changes to the "JetBrains Commit Manager" extension will be document
 - **Visual Feedback**: Console logging for successful and failed auto-stage operations
 - **Non-Intrusive**: Auto-staging happens in the background without interrupting workflow
 
-## [0.0.1] - 2024-08-22
+## [0.0.1] - 2025-09-25
 
 ### Added
 
@@ -42,17 +79,3 @@ All notable changes to the "JetBrains Commit Manager" extension will be document
 - **Git Integration**: Real-time Git status and commit operations
 - **Modern UI**: Clean, JetBrains-inspired webview interface
 - **Keyboard Shortcuts**: Enter key support for quick commits
-
-### Technical Details
-
-- Built with TypeScript and VS Code Extension API
-- Uses webview for rich interactive interface
-- Git operations via command line interface
-- File system watching for automatic updates
-- Modular architecture with separate services for Git operations
-
-### Requirements
-
-- VS Code 1.60.0 or higher
-- Git repository in workspace
-- Git installed and accessible from command line
