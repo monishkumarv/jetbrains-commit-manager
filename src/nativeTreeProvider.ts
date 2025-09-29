@@ -8,7 +8,12 @@ export class ChangelistTreeItem extends vscode.TreeItem {
     super(changelist.name, collapsibleState);
     this.tooltip = changelist.description || changelist.name;
     this.description = `${changelist.files.length} files`;
-    this.contextValue = changelist.isDefault ? 'defaultChangelist' : 'changelist';
+    // Distinguish empty vs non-empty changelists for context menus
+    if (changelist.isDefault) {
+      this.contextValue = changelist.files.length > 0 ? 'defaultChangelistNonEmpty' : 'defaultChangelist';
+    } else {
+      this.contextValue = changelist.files.length > 0 ? 'changelistNonEmpty' : 'changelist';
+    }
     this.iconPath = undefined; // Remove prefix icons from changelists
 
     // Add checkbox support for changelist selection

@@ -227,8 +227,8 @@
       "view/item/context": [
         {
           "command": "jetbrains-commit-manager.revertChangelist",
-          "when": "view == jetbrains-commit-manager.changelists && (viewItem == changelist || viewItem == defaultChangelist)",
-          "group": "inline@1"
+          "when": "view == jetbrains-commit-manager.changelists && (viewItem == changelistNonEmpty || viewItem == defaultChangelistNonEmpty)",
+          "group": "2_modification"
         },
         {
           "command": "jetbrains-commit-manager.renameChangelist",
@@ -238,12 +238,12 @@
         {
           "command": "jetbrains-commit-manager.deleteChangelist",
           "when": "view == jetbrains-commit-manager.changelists && viewItem == changelist && viewItem != defaultChangelist",
-          "group": "inline@2"
+          "group": "2_modification"
         },
         {
           "command": "jetbrains-commit-manager.revertFile",
           "when": "view == jetbrains-commit-manager.changelists && viewItem == file",
-          "group": "inline@1"
+          "group": "2_modification"
         },
         {
           "command": "jetbrains-commit-manager.openFile",
