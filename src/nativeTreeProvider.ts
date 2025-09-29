@@ -53,10 +53,10 @@ export class FileTreeItem extends vscode.TreeItem {
     // Add checkbox behavior - use checkboxState for native checkboxes
     this.checkboxState = file.isSelected ? vscode.TreeItemCheckboxState.Checked : vscode.TreeItemCheckboxState.Unchecked;
 
-    // Add command to open file on click
+    // Add command to open diff on click
     this.command = {
-      command: 'vscode.open',
-      title: 'Open File',
+      command: 'jetbrains-commit-manager.openDiff',
+      title: 'Open Diff',
       arguments: [this.resourceUri],
     };
   }

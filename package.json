@@ -47,7 +47,9 @@
     "onCommand:jetbrains-commit-manager.revertSelectedFiles",
     "onCommand:jetbrains-commit-manager.revertFile",
     "onCommand:jetbrains-commit-manager.revertChangelist",
-    "onCommand:jetbrains-commit-manager.stashSelectedFiles"
+    "onCommand:jetbrains-commit-manager.stashSelectedFiles",
+    "onCommand:jetbrains-commit-manager.openDiff",
+    "onCommand:jetbrains-commit-manager.openFile"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -159,6 +161,16 @@
         "category": "JetBrains Commit Manager",
         "icon": "$(archive)",
         "tooltip": "Stash selected files"
+      },
+      {
+        "command": "jetbrains-commit-manager.openDiff",
+        "title": "Open Diff",
+        "category": "JetBrains Commit Manager"
+      },
+      {
+        "command": "jetbrains-commit-manager.openFile",
+        "title": "Open File",
+        "category": "JetBrains Commit Manager"
       }
     ],
     "viewsContainers": {
@@ -232,6 +244,11 @@
           "command": "jetbrains-commit-manager.revertFile",
           "when": "view == jetbrains-commit-manager.changelists && viewItem == file",
           "group": "inline@1"
+        },
+        {
+          "command": "jetbrains-commit-manager.openFile",
+          "when": "view == jetbrains-commit-manager.changelists && viewItem == file",
+          "group": "navigation@2"
         }
       ]
     }

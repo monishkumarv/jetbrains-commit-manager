@@ -130,6 +130,52 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }),
 
+    // Open a diff for a file from the tree
+    vscode.commands.registerCommand('jetbrains-commit-manager.openDiff', async (uri: vscode.Uri) => {
+      try {
+        // Build a proper git-scheme URI with JSON query as expected by Git extension
+        const left = vscode.Uri.from({
+          scheme: 'git',
+          path: uri.fsPath,
+          query: JSON.stringify({ path: uri.fsPath, ref: 'HEAD' }),
+        });
+
+        const right = uri; // working tree
+        const fileName = uri.fsPath.split('/').pop() || 'file';
+        const title = `${fileName} (HEAD ↔︎ Working Tree)`;
+
+        await vscode.commands.executeCommand('vscode.diff', left, right, title);
+      } catch (error) {
+        // Fallback to open if diff fails
+        await vscode.commands.executeCommand('vscode.open', uri);
+      }
+    }),
+
+    // Open the source file from a file item context menu
+    vscode.commands.registerCommand('jetbrains-commit-manager.openFile', async (arg?: any) => {
+      try {
+        let targetUri: vscode.Uri | undefined;
+        if (arg && arg.resourceUri) {
+          targetUri = arg.resourceUri as vscode.Uri;
+        } else if (arg instanceof vscode.Uri) {
+          targetUri = arg;
+        }
+        if (!targetUri) {
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            targetUri = editor.document.uri;
+          }
+        }
+        if (targetUri) {
+          await vscode.commands.executeCommand('vscode.open', targetUri);
+        } else {
+          vscode.window.showInformationMessage('No file to open.');
+        }
+      } catch (e) {
+        // ignore
+      }
+    }),
+
     vscode.commands.registerCommand('jetbrains-commit-manager.createChangelist', async () => {
       const name = await vscode.window.showInputBox({
         prompt: 'Enter changelist name',
