@@ -32,6 +32,24 @@ Bring JetBrains-style commit workflows to VS Code. Organize changes into changel
 
 ... or if the extension is not visible in the marketplace (sometimes happens in Vs Code wrappers such as Cursor IDE, etc.)
 
+### Option A: Add Open VSX gallery (recommended for Cursor)
+
+1. Open Settings (`Cmd+,` on macOS or `Ctrl+,` on Windows/Linux)
+2. Search for "Extensions: Additional Extension Galleries"
+3. Click "Edit in settings.json"
+4. Add the Open VSX gallery URL to `extensions.gallery.serviceUrl`:
+
+```json
+{
+  "extensions.gallery.serviceUrl": "https://open-vsx.org/vscode/gallery"
+}
+```
+
+5. Reload the window
+6. Open Extensions (`Ctrl/Cmd+Shift+X`), search "JetBrains Commit Manager", and install
+
+### Option B: Install from VSIX (offline/manual)
+
 1. Download the `.vsix` file from the [Open VSX](https://open-vsx.org/extension/monishkumarv/jetbrains-commit-manager) page
 2. Open VS Code/Cursor IDE
 3. Go to Extensions (`Ctrl+Shift+X`)
