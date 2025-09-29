@@ -64,6 +64,7 @@ Bring JetBrains-style commit workflows to VS Code. Organize changes into changel
 - **Create**: Right-click in the sidebar → "Create Changelist"
 - **Move files**: Drag & drop files between changelists
 - **Delete**: Right-click changelist → "Delete Changelist" (files move to default)
+- **Revert**: Right-click changelist → "Revert Changelist"
 
 ### Committing
 
@@ -79,6 +80,8 @@ Bring JetBrains-style commit workflows to VS Code. Organize changes into changel
 | `Create Changelist`     | Create a new changelist         |
 | `Commit Selected Files` | Commit currently selected files |
 | `Stash Selected Files`  | Stash currently selected files  |
+| `Open File`             | Open the source file            |
+| `Open Diff`             | Show diff (HEAD ↔ working tree) |
 
 ## Configuration
 
