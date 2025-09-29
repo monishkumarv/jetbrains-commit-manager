@@ -3,11 +3,11 @@ import { FileItem } from './types';
 
 export class CommitDialog {
   private panel: vscode.WebviewPanel | undefined;
-  private resolvePromise: ((value: { message: string; files: FileItem[] } | undefined) => void) | undefined;
+  private resolvePromise: ((value: { message: string; files: FileItem[]; amend: boolean } | undefined) => void) | undefined;
 
   constructor(private files: FileItem[]) {}
 
-  async show(): Promise<{ message: string; files: FileItem[] } | undefined> {
+  async show(): Promise<{ message: string; files: FileItem[]; amend: boolean } | undefined> {
     this.panel = vscode.window.createWebviewPanel('commitDialog', 'Commit Changes', vscode.ViewColumn.One, {
       enableScripts: true,
       retainContextWhenHidden: true,
@@ -22,6 +22,7 @@ export class CommitDialog {
             this.resolvePromise({
               message: message.message,
               files: this.files,
+              amend: message.amend === true,
             });
           }
           this.panel?.dispose();
@@ -264,6 +265,9 @@ export class CommitDialog {
           </div>
           
           <div class="actions">
+            <label style="display:flex;align-items:center;gap:6px;margin-right:auto;">
+              <input type="checkbox" id="amend-checkbox" /> Amend last commit
+            </label>
             <button class="btn btn-secondary" onclick="cancel()">Cancel</button>
             <button class="btn btn-primary" onclick="commit()">Commit</button>
           </div>
@@ -274,6 +278,7 @@ export class CommitDialog {
           
           function commit() {
             const message = document.getElementById('commit-message').value.trim();
+            const amend = document.getElementById('amend-checkbox').checked === true;
             if (!message) {
               alert('Please enter a commit message');
               return;
@@ -281,7 +286,8 @@ export class CommitDialog {
             
             vscode.postMessage({
               command: 'commit',
-              message: message
+              message: message,
+              amend: amend
             });
           }
           

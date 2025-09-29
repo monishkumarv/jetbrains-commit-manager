@@ -66,7 +66,7 @@ export class WebviewCommitManager {
           this.panel!.webview.html = this.getWebviewContent();
           break;
         case 'commit':
-          await this.commitSelectedFiles(message.message);
+          await this.commitSelectedFiles(message.message, message.amend === true);
           break;
         case 'stash':
           await this.stashSelectedFiles(message.message);
@@ -216,7 +216,7 @@ export class WebviewCommitManager {
     return selectedFiles;
   }
 
-  private async commitSelectedFiles(message: string): Promise<void> {
+  private async commitSelectedFiles(message: string, amend: boolean): Promise<void> {
     const selectedFiles = this.getSelectedFiles();
 
     if (selectedFiles.length === 0) {
@@ -224,7 +224,7 @@ export class WebviewCommitManager {
       return;
     }
 
-    const success = await this.gitService.commitFiles(selectedFiles, message);
+    const success = await this.gitService.commitFiles(selectedFiles, message, { amend });
 
     if (success) {
       vscode.window.showInformationMessage(`Successfully committed ${selectedFiles.length} file(s)`);
@@ -513,6 +513,9 @@ export class WebviewCommitManager {
             placeholder="Enter commit message..."
             id="commitMessage"
           />
+          <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
+            <input type="checkbox" id="amendCheckbox" /> Amend last commit
+          </label>
           <button class="btn btn-primary" onclick="commit()" ${selectedFiles.length === 0 ? 'disabled' : ''}>
             Commit
           </button>
@@ -726,6 +729,7 @@ export class WebviewCommitManager {
           
           function commit() {
             const message = document.getElementById('commitMessage').value.trim();
+            const amend = document.getElementById('amendCheckbox').checked === true;
             if (!message) {
               alert('Please enter a commit message');
               return;
@@ -733,7 +737,8 @@ export class WebviewCommitManager {
             
             vscode.postMessage({ 
               command: 'commit', 
-              message: message 
+              message: message,
+              amend: amend
             });
           }
 

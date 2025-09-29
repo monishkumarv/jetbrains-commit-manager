@@ -315,10 +315,28 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       if (message) {
-        const success = await gitService.commitFiles(selectedFiles, message.trim());
+        const choice = await vscode.window.showQuickPick(
+          [
+            { label: 'Commit', amend: false, push: false },
+            { label: 'Amend Commit', amend: true, push: false },
+            { label: 'Commit and Push', amend: false, push: true },
+            { label: 'Amend Commit and Push', amend: true, push: true },
+          ],
+          { placeHolder: 'Choose commit action' }
+        );
+        if (!choice) {
+          return;
+        }
+        const success = await gitService.commitFiles(selectedFiles, message.trim(), { amend: choice.amend });
 
         if (success) {
           vscode.window.showInformationMessage(`Successfully committed ${selectedFiles.length} file(s)`);
+          if (choice.push) {
+            const pushed = await gitService.pushCurrentBranch();
+            if (pushed) {
+              vscode.window.showInformationMessage('Pushed to remote successfully');
+            }
+          }
           treeProvider.refresh();
           updateAllCommitUI();
           updateCommitButtonContext();
@@ -568,10 +586,28 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       if (message) {
-        const success = await gitService.commitFiles(selectedFiles, message.trim());
+        const choice = await vscode.window.showQuickPick(
+          [
+            { label: 'Commit', amend: false, push: false },
+            { label: 'Amend Commit', amend: true, push: false },
+            { label: 'Commit and Push', amend: false, push: true },
+            { label: 'Amend Commit and Push', amend: true, push: true },
+          ],
+          { placeHolder: 'Choose commit action' }
+        );
+        if (!choice) {
+          return;
+        }
+        const success = await gitService.commitFiles(selectedFiles, message.trim(), { amend: choice.amend });
 
         if (success) {
           vscode.window.showInformationMessage(`Successfully committed ${selectedFiles.length} file(s)`);
+          if (choice.push) {
+            const pushed = await gitService.pushCurrentBranch();
+            if (pushed) {
+              vscode.window.showInformationMessage('Pushed to remote successfully');
+            }
+          }
           treeProvider.refresh();
           updateAllCommitUI();
           updateCommitButtonContext();

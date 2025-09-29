@@ -6,6 +6,7 @@ export class CommitUI {
   private webview: vscode.WebviewView | undefined;
   private gitService: GitService;
   private currentMessage: string = '';
+  private amend: boolean = false;
   private selectedFilesCount: number = 0;
   private totalFilesCount: number = 0;
 
@@ -194,6 +195,16 @@ export class CommitUI {
           const stashButton = document.getElementById('stash-button');
           const fileCount = document.getElementById('file-count');
           const errorMessage = document.getElementById('error-message');
+          let amend = ${this.amend ? 'true' : 'false'};
+
+          // Inline toggle via context menu (simple)
+          commitButton.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            amend = !amend;
+            commitButton.textContent = (amend ? 'Amend: ' : '') + (${this.selectedFilesCount} > 0 ? 'Commit (' + ${
+      this.selectedFilesCount
+    } + ')' : 'Commit');
+          });
 
           // Handle commit button click
           commitButton.addEventListener('click', () => {
@@ -208,7 +219,8 @@ export class CommitUI {
             }
             vscode.postMessage({
               command: 'commit',
-              message: message
+              message: message,
+              amend: amend
             });
             hideError();
           });
@@ -259,10 +271,14 @@ export class CommitUI {
                 const selectedCount = message.selectedFiles;
                 const totalCount = message.totalFiles;
                 fileCount.textContent = selectedCount > 0 ? selectedCount + '/' + totalCount + ' files selected' : 'No files selected';
-                commitButton.textContent = selectedCount > 0 ? 'Commit (' + selectedCount + ')' : 'Commit';
+                commitButton.textContent = (amend ? 'Amend: ' : '') + (selectedCount > 0 ? 'Commit (' + selectedCount + ')' : 'Commit');
                 commitButton.disabled = selectedCount === 0;
                 stashButton.textContent = selectedCount > 0 ? 'Stash (' + selectedCount + ')' : 'Stash';
                 stashButton.disabled = selectedCount === 0;
+                break;
+              case 'setAmend':
+                amend = !!message.value;
+                commitButton.textContent = (amend ? 'Amend: ' : '') + commitButton.textContent.replace(/^Amend: /, '');
                 break;
               case 'updateMessage':
                 commitInput.value = message.message;

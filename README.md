@@ -66,10 +66,16 @@ Bring JetBrains-style commit workflows to VS Code. Organize changes into changel
 - **Delete**: Right-click changelist → "Delete Changelist" (files move to default)
 - **Revert**: Right-click changelist → "Revert Changelist"
 
-### Committing
+### Committing and Ammending commits
 
 - **Select files**: Click checkboxes next to files
-- **Commit**: Use the status bar button or `Ctrl+Shift+P` → "Commit Selected Files"
+- **Commit**: Use the status bar button or `Ctrl+Shift+P` → "Commit Selected Files". When committing from commands or the status bar, you can choose:
+  - `Commit`
+  - `Amend Commit`
+  - `Commit and Push`
+  - `Amend Commit and Push`
+- **Amend**: In the webview and commit dialog, there is an "Amend last commit" checkbox. In the compact sidebar UI, right‑click the Commit button to toggle "Amend" (button label shows "Amend:" when active).
+- **Push**: Choosing a "…and Push" option will push the current branch after a successful commit. If the branch has no upstream set, the extension will set upstream to `origin/<branch>` on first push.
 - **Stash**: Use the stash button next to commit for temporary storage
 
 ### Commands

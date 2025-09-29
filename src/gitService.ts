@@ -46,7 +46,7 @@ export class GitService {
     }
   }
 
-  async commitFiles(files: FileItem[], message: string): Promise<boolean> {
+  async commitFiles(files: FileItem[], message: string, options?: { amend?: boolean }): Promise<boolean> {
     try {
       if (files.length === 0) {
         throw new Error('No files selected for commit');
@@ -72,13 +72,40 @@ export class GitService {
 
       const filePaths = files.map((f) => f.path);
       // Commit only the selected files (limit commit to these paths even if other files are staged)
-      const commitArgs = ['commit', '-m', message, '--only', '--', ...filePaths];
+      const commitArgs = ['commit', '-m', message, '--only'];
+      if (options?.amend) {
+        commitArgs.push('--amend', '--no-edit');
+      }
+      commitArgs.push('--', ...filePaths);
       await this.executeGitCommand(commitArgs);
 
       return true;
     } catch (error) {
       console.error('Error committing files:', error);
       vscode.window.showErrorMessage(`Failed to commit files: ${error}`);
+      return false;
+    }
+  }
+
+  async pushCurrentBranch(): Promise<boolean> {
+    try {
+      // Determine current branch
+      const { stdout: branchOut } = await this.executeGitCommand(['rev-parse', '--abbrev-ref', 'HEAD']);
+      const branch = branchOut.trim();
+      if (!branch || branch === 'HEAD') {
+        throw new Error('Unable to determine current branch');
+      }
+      // Push with upstream if needed
+      try {
+        await this.executeGitCommand(['push']);
+      } catch (e) {
+        // Fallback: set upstream explicitly
+        await this.executeGitCommand(['push', '--set-upstream', 'origin', branch]);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error pushing branch:', error);
+      vscode.window.showErrorMessage(`Failed to push: ${error}`);
       return false;
     }
   }
@@ -341,12 +368,22 @@ export class GitService {
     const retryOnLock = options?.retryOnLock !== false;
     try {
       return await new Promise((resolve, reject) => {
-        const { exec } = require('child_process');
-        const command = `git ${args.join(' ')}`;
-
-        exec(command, { cwd: this.workspaceRoot }, (error: any, stdout: string, stderr: string) => {
-          if (error) {
-            reject(new Error(stderr || String(error)));
+        const { spawn } = require('child_process');
+        const child = spawn('git', args, { cwd: this.workspaceRoot, shell: false });
+        let stdout = '';
+        let stderr = '';
+        child.stdout.on('data', (data: Buffer) => {
+          stdout += data.toString();
+        });
+        child.stderr.on('data', (data: Buffer) => {
+          stderr += data.toString();
+        });
+        child.on('error', (err: any) => {
+          reject(new Error(stderr || String(err)));
+        });
+        child.on('close', (code: number) => {
+          if (code !== 0) {
+            reject(new Error(stderr.trim() || `git exited with code ${code}`));
           } else {
             resolve({ stdout, stderr });
           }
