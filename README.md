@@ -66,7 +66,7 @@ Bring JetBrains-style commit workflows to VS Code. Organize changes into changel
 - **Delete**: Right-click changelist → "Delete Changelist" (files move to default)
 - **Revert**: Right-click changelist → "Revert Changelist"
 
-### Committing and Ammending commits
+### Committing and Amending commits
 
 - **Select files**: Click checkboxes next to files
 - **Commit**: Use the status bar button or `Ctrl+Shift+P` → "Commit Selected Files". When committing from commands or the status bar, you can choose:
